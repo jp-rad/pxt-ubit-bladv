@@ -1,0 +1,5 @@
+{
+  "bladv": "BLADV - Accumulate the Complete list of 16-bit Service UUIDs as an AD structure in the advertising payload for micro:bit.",
+  "bladv.accumulateCompleteList16BitServiceID": "Set Complete list of 16-bit Service ID.",
+  "bladv.accumulateCompleteList16BitServiceID|param|serviceUUID": "16-bit Service ID"
+}
