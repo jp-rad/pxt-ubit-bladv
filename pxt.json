@@ -1,6 +1,6 @@
 {
-    "name": "pxt-ubit-extension",
-    "description": "",
+    "name": "pxt-ubit-bladv",
+    "description": "Accumulate the Complete list of 16-bit Service UUIDs as an AD structure in the advertising payload for micro:bit.",
     "dependencies": {
         "core": "*"
     },
@@ -8,10 +8,10 @@
         "README.md",
         "enums.d.ts",
         "shims.d.ts",
-        "custom.ts",
-        "custom.cpp",
-        "lib/customlib.h",
-        "lib/customlib.cpp"
+        "bladv.ts",
+        "bladv.cpp",
+        "lib/bladvlib.h",
+        "lib/bladvlib.cpp"
     ],
     "testFiles": [
         "test.ts"
@@ -23,5 +23,66 @@
     "supportedTargets": [
         "microbit"
     ],
-    "preferredEditor": "tsprj"
+    "preferredEditor": "tsprj",
+    "yotta": {
+        "config": {
+            "microbit-dal": {
+                "bluetooth": {
+                    "enabled": 1
+                }
+            }
+        },
+        "userConfigs": [
+            {
+                "description": "Enable Bluetooth",
+                "config": {
+                    "microbit-dal": {
+                        "bluetooth": {
+                            "enabled": 1
+                        }
+                    }
+                }
+            },
+            {
+                "description": "Disable Bluetooth Secure DFU Service",
+                "config": {
+                    "microbit-dal": {
+                        "bluetooth": {
+                            "dfu_service": 0
+                        }
+                    }
+                }
+            },
+            {
+                "description": "Disable Bluetooth micro:bit Partial Flashing Service",
+                "config": {
+                    "microbit-dal": {
+                        "bluetooth": {
+                            "partial_flashing": 0
+                        }
+                    }
+                }
+            },
+            {
+                "description": "Disable Bluetooth Device Infomation Service",
+                "config": {
+                    "microbit-dal": {
+                        "bluetooth": {
+                            "device_info_service": 0
+                        }
+                    }
+                }
+            },
+            {
+                "description": "Disable Bluetooth micro:bit Event Service",
+                "config": {
+                    "microbit-dal": {
+                        "bluetooth": {
+                            "event_service": 0
+                        }
+                    }
+                }
+            }
+        ]
+    }
 }

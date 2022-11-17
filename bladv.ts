@@ -1,3 +1,5 @@
+
+/*
 MIT License
 
 Copyright (c) 2022 jp-rad
@@ -19,3 +21,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+
+
+/**
+ * BLADV - Accumulate the Complete list of 16-bit Service UUIDs as an AD structure in the advertising payload for micro:bit.
+ */
+//% block="BLADV"
+//% weight=100 color=#4b0082 icon="\uf09e"
+namespace bladv {
+    
+    /**
+     * Set Complete list of 16-bit Service ID.
+     * @param serviceUUID 16-bit Service ID
+     */
+    //% blockId=bladv_accumulate_complete_list_16bit_service_id
+    //% block="BLADV Complete list of 16-bit Service ID: %serviceUUID"
+    //% serviceUUID.min=1 serviceUUID.max=65535 serviceUUID.defl=6144
+    //% shim=bladv::accumulateCompleteList16BitServiceID
+    export function accumulateCompleteList16BitServiceID(serviceUUID: number): void
+    {
+        return;
+    }
+
+}
