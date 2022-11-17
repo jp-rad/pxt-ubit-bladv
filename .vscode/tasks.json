@@ -1,0 +1,157 @@
+
+// A task runner that calls the MakeCode (PXT) compiler
+{
+    "version": "2.0.0",
+    "tasks": [{
+        "label": "pxt deploy",
+        "type": "shell",
+        "command": "pxt deploy --local",
+        "group": "build",
+        "problemMatcher": [ "$tsc" ]
+    }, {
+        "label": "pxt build",
+        "type": "shell",
+        "command": "pxt build --local",
+        "group": "build",
+        "problemMatcher": [ "$tsc" ]
+    }, {
+        "label": "pxt install",
+        "type": "shell",
+        "command": "pxt install",
+        "group": "build",
+        "problemMatcher": [ "$tsc" ]
+    }, {
+        "label": "pxt clean",
+        "type": "shell",
+        "command": "pxt clean",
+        "group": "test",
+        "problemMatcher": [ "$tsc" ]
+    },
+    {
+        "label": "(vscode) pxt test",
+        "type": "shell",
+        "command": "pxt",
+        "args": [
+            "test"
+        ],
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build"
+    },
+    {
+        "label": "(vscode) pxt deploy",
+        "type": "shell",
+        "command": "pxt",
+        "args": [
+            "deploy"
+        ],
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build"
+    },
+    {
+        "label": "(vscode) pxt build",
+        "type": "shell",
+        "command": "pxt",
+        "args": [
+            "build"
+        ],
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build"
+    },
+    {
+        "label": "(vscode) pxt clean",
+        "type": "shell",
+        "command": "pxt",
+        "args": [
+            "clean"
+        ],
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build"
+    },
+    {
+        "label": "(vscode) pxt gendocs --locs",
+        "type": "shell",
+        "command": "pxt",
+        "args": [
+            "gendocs",
+            "--locs"
+        ],
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build"
+    },
+    {
+        "label": "(vscode) pxt serve",
+        "type": "shell",
+        "command": "pxt",
+        "args": [
+            "serve"
+        ],
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build"
+    },
+    {
+        "label": "(vscode) pxt target microbit",
+        "type": "shell",
+        "command": "pxt",
+        "args": [
+            "target", "microbit"
+        ],
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build"
+    },
+    {
+        "label": "(vscode) pxt install",
+        "type": "shell",
+        "command": "pxt",
+        "args": [
+            "install"
+        ],
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build"
+    },
+    {
+        "label": "(vscode) rm package-lock.json",
+        "type": "shell",
+        "command": "rm",
+        "args": [
+            "package-lock.json"
+        ],
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build"
+    },
+    {
+        "label": "(vscode) Set target to micro:bit",
+        "type": "shell",
+        "command": "echo",
+        "args": [
+            "done!"
+        ],
+        "dependsOrder": "sequence",
+        "dependsOn": [
+            "(vscode) pxt target microbit",
+            "(vscode) pxt install",
+            "(vscode) rm package-lock.json"
+        ],
+        "problemMatcher": [
+            "$tsc"
+        ],
+        "group": "build"
+    }]
+}

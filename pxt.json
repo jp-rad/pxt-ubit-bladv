@@ -1,0 +1,27 @@
+{
+    "name": "pxt-ubit-extension",
+    "description": "",
+    "dependencies": {
+        "core": "*"
+    },
+    "files": [
+        "README.md",
+        "enums.d.ts",
+        "shims.d.ts",
+        "custom.ts",
+        "custom.cpp",
+        "lib/customlib.h",
+        "lib/customlib.cpp"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "targetVersions": {
+        "target": "4.0.11",
+        "targetId": "microbit"
+    },
+    "supportedTargets": [
+        "microbit"
+    ],
+    "preferredEditor": "tsprj"
+}

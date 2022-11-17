@@ -1,0 +1,33 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.185.0/containers/cpp
+{
+	"name": "pxt-microbit(C++)",
+	"build": {
+		"dockerfile": "Dockerfile",
+		// Update 'VARIANT' to pick an Debian OS version: buster, stretch
+		"args": { "VARIANT": "buster" }
+	},
+	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"],
+
+    "workspaceMount": "type=bind,source=${localWorkspaceFolder},target=/home/vscode/workspace",
+	"workspaceFolder": "/home/vscode/workspace",
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": {},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-vscode.cpptools",
+		"ms-vscode.vscode-typescript-next"
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "pxt target microbit && pxt install && rm package-lock.json",
+
+	// Comment out this line to run as root instead.
+	"remoteUser": "vscode"
+
+}

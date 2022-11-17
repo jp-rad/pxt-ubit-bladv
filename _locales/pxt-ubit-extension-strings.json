@@ -1,0 +1,9 @@
+{
+  "MyEnum.One|block": "one",
+  "MyEnum.Two|block": "two",
+  "custom.bar|block": "true",
+  "custom.fib|block": "true",
+  "custom.foo|block": "true",
+  "custom|block": "custom",
+  "{id:category}Custom": "Custom"
+}

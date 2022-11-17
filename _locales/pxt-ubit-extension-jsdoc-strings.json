@@ -1,0 +1,12 @@
+{
+  "MyEnum": "Use this file to define custom functions and blocks.\nRead more at https://makecode.microbit.org/blocks/custom",
+  "custom": "Custom blocks\nicon: a Unicode identifier for an icon from the Font Awesome icon set.\nhttp://fontawesome.io/icons",
+  "custom.bar": "TODO: describe your function here",
+  "custom.bar|param|value": "describe value here, eg: 5",
+  "custom.fib": "TODO: describe your function here",
+  "custom.fib|param|value": "describe value here, eg: 5",
+  "custom.foo": "TODO: describe your function here",
+  "custom.foo|param|e": "describe parameter here",
+  "custom.foo|param|n": "describe parameter here, eg: 5",
+  "custom.foo|param|s": "describe parameter here, eg: \"Hello\""
+}
