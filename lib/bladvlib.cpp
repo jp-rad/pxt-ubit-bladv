@@ -142,7 +142,6 @@ void accumulateCompleteList16BitServiceID( const uint16_t serviceUUID)
     // Configure
     static ble_uuid_t uuid;
     uuid.type = BLE_UUID_TYPE_BLE;
-    //uuid.uuid = BLEFitnessMachineServiceDal::serviceUUID;
     uuid.uuid = serviceUUID;
 
     bool connectable = true;
