@@ -11,6 +11,7 @@ This repository can be added as an **extension** in MakeCode.
 
 * open [https://makecode.microbit.org/](https://makecode.microbit.org/)
 * click on **New Project**
+* turn on **No Pairing Required: Anyone can connect via Bluetooth.** option in Project settings.
 * click on **Extensions** under the gearwheel menu
 * search for **https://github.com/jp-rad/pxt-ubit-bladv** and import
 

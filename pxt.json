@@ -34,11 +34,11 @@
         },
         "userConfigs": [
             {
-                "description": "Enable Bluetooth",
+                "description": "Disable Bluetooth Device Infomation Service",
                 "config": {
                     "microbit-dal": {
                         "bluetooth": {
-                            "enabled": 1
+                            "device_info_service": 0
                         }
                     }
                 }
@@ -64,21 +64,21 @@
                 }
             },
             {
-                "description": "Disable Bluetooth Device Infomation Service",
-                "config": {
-                    "microbit-dal": {
-                        "bluetooth": {
-                            "device_info_service": 0
-                        }
-                    }
-                }
-            },
-            {
                 "description": "Disable Bluetooth micro:bit Event Service",
                 "config": {
                     "microbit-dal": {
                         "bluetooth": {
                             "event_service": 0
+                        }
+                    }
+                }
+            },
+            {
+                "description": "Reset Bluetooth Enabled",
+                "config": {
+                    "microbit-dal": {
+                        "bluetooth": {
+                            "enabled": 1
                         }
                     }
                 }
