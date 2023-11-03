@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 jp-rad
+Copyright (c) 2022-2023 jp-rad
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,33 @@ SOFTWARE.
 #include "pxt.h"
 #include "lib/bladvlib.h"
 
-namespace bladv {
-    
+namespace bladv
+{
+
     //%
-    void accumulateCompleteList16BitServiceID(int serviceUUID) {
+    void accumulateCompleteList16BitServiceID(int serviceUUID)
+    {
         bladvlib::accumulateCompleteList16BitServiceID((uint16_t)serviceUUID);
     }
-    
+
+    //%
+    void sendToTako(int mark)
+    {
+        bladvlib::advertiseTako((int8_t)mark);
+    }
+
+    //%
+    void resetTako()
+    {
+        bladvlib::advertiseTako(-1);
+    }
+
+    //%
+    void stopTako()
+    {
+        resetTako();
+        // Stop
+        uBit.bleManager.stopAdvertising();
+    }
+
 }
