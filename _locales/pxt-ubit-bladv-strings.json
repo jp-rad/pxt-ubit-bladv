@@ -1,5 +1,15 @@
 {
+  "TakoSymbols.Circle|block": "circle",
+  "TakoSymbols.Heart|block": "heart",
+  "TakoSymbols.Square|block": "square",
+  "TakoSymbols.Star|block": "star",
+  "TakoSymbols.Triangle|block": "triangle",
+  "bladv._resetTako|block": "true",
+  "bladv._sendToTako|block": "true",
+  "bladv._stopTako|block": "true",
   "bladv.accumulateCompleteList16BitServiceID|block": "BLADV Complete list of 16-bit Service ID: %serviceUUID",
+  "bladv.sendToTako|block": "TAKO Send %i",
   "bladv|block": "BLADV",
-  "{id:category}Bladv": "Bladv"
+  "{id:category}Bladv": "Bladv",
+  "{id:group}Tako": "Tako"
 }

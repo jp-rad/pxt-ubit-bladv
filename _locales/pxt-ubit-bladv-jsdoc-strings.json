@@ -1,5 +1,11 @@
 {
   "bladv": "BLADV - Accumulate the Complete list of 16-bit Service UUIDs as an AD structure in the advertising payload for micro:bit.",
+  "bladv._resetTako": "(shim) Reset TAKO.",
+  "bladv._sendToTako": "(shim) Send mark to TAKO.",
+  "bladv._sendToTako|param|mark": "0:circle, 1:square, 2:star, 3:heart, 4:triangle",
+  "bladv._stopTako": "(shim) Stop TAKO.",
   "bladv.accumulateCompleteList16BitServiceID": "Set Complete list of 16-bit Service ID.",
-  "bladv.accumulateCompleteList16BitServiceID|param|serviceUUID": "16-bit Service ID"
+  "bladv.accumulateCompleteList16BitServiceID|param|serviceUUID": "16-bit Service ID",
+  "bladv.sendToTako": "Send mark to TAKO.",
+  "bladv.sendToTako|param|mark": "0:circle, 1:square, 2:star, 3:heart, 4:triangle"
 }

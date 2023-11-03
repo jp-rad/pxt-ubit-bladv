@@ -2,7 +2,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 jp-rad
+Copyright (c) 2022-2023 jp-rad
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+enum TakoSymbols {
+    //% block="circle"
+    //% jres=icons.chessboard
+    Circle = 0,
+    //% block="square"
+    //% jres=icons.square
+    Square,
+    //% block="star"
+    //% jres=icons.stickfigure
+    Star,
+    //% block="heart"
+    //% jres=icons.heart
+    Heart,
+    //% block="triangle"
+    //% jres=icons.triangle
+    Triangle,
+    
+}
 
 /**
  * BLADV - Accumulate the Complete list of 16-bit Service UUIDs as an AD structure in the advertising payload for micro:bit.
  */
 //% block="BLADV"
 //% weight=100 color=#4b0082 icon="\uf09e"
+//% groups="['Tako']"
 namespace bladv {
-    
+
     /**
      * Set Complete list of 16-bit Service ID.
      * @param serviceUUID 16-bit Service ID
@@ -39,7 +58,82 @@ namespace bladv {
     //% block="BLADV Complete list of 16-bit Service ID: %serviceUUID"
     //% serviceUUID.min=1 serviceUUID.max=65535 serviceUUID.defl=6144
     //% shim=bladv::accumulateCompleteList16BitServiceID
+    //% weight=120
     export function accumulateCompleteList16BitServiceID(serviceUUID: number): void
+    {
+        return;
+    }
+    
+    // for TAKO
+    let _counter = -1;
+    loops.everyInterval(200, function () {
+        if (0 > _counter) {
+            // nop
+        } else if (0 == _counter) {
+            _stopTako();
+            _counter = -1;
+        } else {
+            if (5 == _counter) {
+                _resetTako();
+            }
+            _counter -= 1;
+        }
+    })
+
+    /**
+     * Send mark to TAKO.
+     * @param mark 0:circle, 1:square, 2:star, 3:heart, 4:triangle
+     */
+    //% blockId=bladv_send_to_tako
+    //% block="TAKO Send %i"
+    //% mark.fieldEditor="imagedropdown"
+    //% mark.fieldOptions.columns="1"
+    //% mark.fieldOptions.width="76"
+    //% mark.fieldOptions.maxRows="5"
+    //% weight=110
+    //% group="Tako"
+    export function sendToTako(mark: TakoSymbols): void
+    {
+        _counter = 10;
+        _sendToTako(mark);
+    }
+    
+    /**
+     * (shim) Send mark to TAKO.
+     * @param mark 0:circle, 1:square, 2:star, 3:heart, 4:triangle
+     */
+    //% block
+    //% blockHidden=true
+    //% weight=100
+    //% group="Tako"
+    //% shim=bladv::sendToTako
+    export function _sendToTako(mark: TakoSymbols): void
+    {
+        return;
+    }
+    
+    /**
+     * (shim) Reset TAKO.
+     */
+    //% block
+    //% blockHidden=true
+    //% weight=90
+    //% group="Tako"
+    //% shim=bladv::resetTako
+    export function _resetTako(): void
+    {
+        return;
+    }
+    
+    /**
+     * (shim) Stop TAKO.
+     */
+    //% block
+    //% blockHidden=true
+    //% weight=80
+    //% group="Tako"
+    //% shim=bladv::stopTako
+    export function _stopTako(): void
     {
         return;
     }

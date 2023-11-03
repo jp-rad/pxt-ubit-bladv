@@ -54,13 +54,21 @@ DEALINGS IN THE SOFTWARE.
 
 namespace bladvlib {
 
+#define LBS_UUID_TAKO_BASE { 0xc1, 0x97, 0x12, 0xb5, 0xcf, 0x7e, 0xd7, 0xbc, 0x38, 0x45, 0x02, 0x00, 0x00, 0x00, 0x40, 0x25}
+#define LBS_UUID_TAKO_SERVICE 0xb6b0
+
+    static ManagedString takoCircle(   "00000000");
+    static ManagedString takoSquare(   "00000001");
+    static ManagedString takoStar(     "00000002");
+    static ManagedString takoHeart(    "00000003");
+    static ManagedString takoTriangle( "00000004");
+
 //================================================================
 #if MICROBIT_CODAL
 //================================================================
 
 #include "ble_advdata.h"
 #include "peer_manager.h"
-
 /**
  * For configure advertising
  * 
@@ -71,6 +79,12 @@ namespace bladvlib {
 static uint8_t              m_adv_handle    = 0; // WARNING: magic handle number! 
 static uint8_t              m_enc_advdata[ BLE_GAP_ADV_SET_DATA_SIZE_MAX];
 static uint8_t              m_enc_scanrsp[ BLE_GAP_ADV_SET_DATA_SIZE_MAX];
+
+/**
+ * Tako 
+ */
+static bool m_tako_initialized = false;
+static ble_uuid_t m_tako_uuid;
 
 // static void microbit_ble_configureAdvertising( bool, bool, bool, uint16_t, int, ble_advdata_t *);
 // https://github.com/lancaster-university/codal-microbit-v2/blob/master/source/bluetooth/MicroBitBLEManager.cpp#L1187
@@ -148,10 +162,6 @@ void accumulateCompleteList16BitServiceID( const uint16_t serviceUUID)
     uBit.bleManager.stopAdvertising();
 
     // Configure
-    static ble_uuid_t uuid;
-    uuid.type = BLE_UUID_TYPE_BLE;
-    uuid.uuid = serviceUUID;
-
     bool connectable = true;
     bool discoverable = true;
     bool whitelist = false;
@@ -172,12 +182,100 @@ void accumulateCompleteList16BitServiceID( const uint16_t serviceUUID)
 #endif
   
     // Setup advertising.
+    static ble_uuid_t uuid;
+    uuid.type = BLE_UUID_TYPE_BLE;
+    uuid.uuid = serviceUUID;
     microbit_ble_configureAdvertising( connectable, discoverable, whitelist,
                                        MICROBIT_BLE_ADVERTISING_INTERVAL, MICROBIT_BLE_ADVERTISING_TIMEOUT, &uuid);
 
     // Restart
     uBit.bleManager.advertise();
 } 
+
+void initTako()
+{
+    if (m_tako_initialized)
+    {
+        return;
+    }
+    m_tako_initialized = true;
+    // 128bit uuid for tako
+    static ble_uuid128_t base_uuid = {LBS_UUID_TAKO_BASE};
+    MICROBIT_BLE_ECHK(sd_ble_uuid_vs_add(&base_uuid, &m_tako_uuid.type));
+    m_tako_uuid.uuid = LBS_UUID_TAKO_SERVICE;
+}
+
+void setMarkDeviceName( const int8_t mark)
+{
+    // gap device name
+    ManagedString gapName;  // length: 16
+    
+    if ( 0 > mark)
+    {
+        // reset
+        gapName = ManagedString("0000000000000000");
+    }
+    else
+    {
+        ManagedString seq("00000000");  // length: 8
+        seq = (ManagedString(uBit.random(99999998) + 1) + seq).substring(0, 8);
+        switch (mark)
+        {
+        case 0:
+            gapName = seq + takoCircle;
+            break;
+        case 1:
+            gapName = seq + takoSquare;
+            break;
+        case 2:
+            gapName = seq + takoStar;
+            break;
+        case 3:
+            gapName = seq + takoHeart;
+            break;
+        case 4:
+            gapName = seq + takoTriangle;
+            break;
+        default:
+            gapName = seq + takoCircle;
+            break;
+        }
+    }
+    
+    // set gap device name
+    ble_gap_conn_sec_mode_t sec_mode;
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
+    MICROBIT_BLE_ECHK(sd_ble_gap_device_name_set(&sec_mode, (const uint8_t *)gapName.toCharArray(), gapName.length()));
+
+}
+
+void advertiseTako( const int8_t mark)
+{
+    // Stop
+    uBit.bleManager.stopAdvertising();
+
+    // Initialize (once)
+    initTako();
+
+    // gap device name
+    setMarkDeviceName( mark);
+
+    // Setup advertising.
+    bool connectable = false;
+    bool discoverable = true;
+    bool whitelist = false;
+    microbit_ble_configureAdvertising( connectable, discoverable, whitelist,
+                                       MICROBIT_BLE_ADVERTISING_INTERVAL, MICROBIT_BLE_ADVERTISING_TIMEOUT, &m_tako_uuid);
+
+    // Restart
+    uBit.bleManager.advertise();
+
+    if ( 0>mark )
+    {
+        // Stop
+        uBit.bleManager.stopAdvertising();
+    }
+}
 
 //================================================================
 #else // MICROBIT_CODAL
@@ -187,6 +285,11 @@ void accumulateCompleteList16BitServiceID( const uint16_t serviceUUID)
 {
     // Complete list of 16-bit Service IDs.
     uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_16BIT_SERVICE_IDS, (uint8_t *)&serviceUUID, 2);
+}
+
+void advertiseTako( const int8_t mark)
+{
+    // 0-4: message, -1: reset
 }
 
 //================================================================
