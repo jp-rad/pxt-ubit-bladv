@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 jp-rad
+Copyright (c) 2022-2023 jp-rad
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -70,6 +70,7 @@ namespace bladvlib {
 // static uint8_t              m_adv_handle    = BLE_GAP_ADV_SET_HANDLE_NOT_SET;
 static uint8_t              m_adv_handle    = 0; // WARNING: magic handle number! 
 static uint8_t              m_enc_advdata[ BLE_GAP_ADV_SET_DATA_SIZE_MAX];
+static uint8_t              m_enc_scanrsp[ BLE_GAP_ADV_SET_DATA_SIZE_MAX];
 
 // static void microbit_ble_configureAdvertising( bool, bool, bool, uint16_t, int, ble_advdata_t *);
 // https://github.com/lancaster-university/codal-microbit-v2/blob/master/source/bluetooth/MicroBitBLEManager.cpp#L1187
@@ -85,7 +86,7 @@ static uint8_t              m_enc_advdata[ BLE_GAP_ADV_SET_DATA_SIZE_MAX];
  */
 static void microbit_ble_configureAdvertising( bool connectable, bool discoverable, bool whitelist,
                                                uint16_t interval_ms, int timeout_seconds,
-                                               ble_advdata_t *p_advdata)
+                                               ble_advdata_t *p_advdata, ble_advdata_t *p_scanrsp)
 {
     MICROBIT_DEBUG_DMESG( "configureAdvertising connectable %d, discoverable %d", (int) connectable, (int) discoverable);
     MICROBIT_DEBUG_DMESG( "whitelist %d, interval_ms %d, timeout_seconds %d", (int) whitelist, (int) interval_ms, (int) timeout_seconds);
@@ -110,6 +111,10 @@ static void microbit_ble_configureAdvertising( bool connectable, bool discoverab
     gap_adv_data.adv_data.len       = BLE_GAP_ADV_SET_DATA_SIZE_MAX;
     MICROBIT_BLE_ECHK( ble_advdata_encode( p_advdata, gap_adv_data.adv_data.p_data, &gap_adv_data.adv_data.len));
     //NRF_LOG_HEXDUMP_INFO( gap_adv_data.adv_data.p_data, gap_adv_data.adv_data.len);
+    gap_adv_data.scan_rsp_data.p_data = m_enc_scanrsp;
+    gap_adv_data.scan_rsp_data.len = BLE_GAP_ADV_SET_DATA_SIZE_MAX;
+    MICROBIT_BLE_ECHK(ble_advdata_encode(p_scanrsp, gap_adv_data.scan_rsp_data.p_data, &gap_adv_data.scan_rsp_data.len));
+    // NRF_LOG_HEXDUMP_INFO( gap_adv_data.scan_rsp_data.p_data, gap_adv_data.scan_rsp_data.len);
     MICROBIT_BLE_ECHK( sd_ble_gap_adv_set_configure( &m_adv_handle, &gap_adv_data, &gap_adv_params));
 }
 
@@ -125,10 +130,13 @@ static void microbit_ble_configureAdvertising( bool connectable, bool discoverab
     advdata.flags     = !whitelist && discoverable
                       ? BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED | BLE_GAP_ADV_FLAG_LE_GENERAL_DISC_MODE
                       : BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
-    advdata.uuids_complete.p_uuids = p_uuid;
-    advdata.uuids_complete.uuid_cnt = 1;
+    
+    ble_advdata_t scanrsp;
+    memset(&scanrsp, 0, sizeof(scanrsp));
+    scanrsp.uuids_complete.p_uuids = p_uuid;
+    scanrsp.uuids_complete.uuid_cnt = 1;
 
-    microbit_ble_configureAdvertising( connectable, discoverable, whitelist, interval_ms, timeout_seconds, &advdata);
+    microbit_ble_configureAdvertising( connectable, discoverable, whitelist, interval_ms, timeout_seconds, &advdata, &scanrsp);
 }
 
 // Setup advertising.
