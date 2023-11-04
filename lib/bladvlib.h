@@ -27,11 +27,12 @@ SOFTWARE.
 
 #include "pxt.h"
 
-namespace bladvlib {
+namespace bladvlib
+{
 
-void accumulateCompleteList16BitServiceID( const uint16_t serviceUUID);
+    void accumulateCompleteList16BitServiceID(const uint16_t serviceUUID);
 
-void advertiseTako( const int8_t mark);
+    void advertiseTako(const int8_t symbol);
 
 }
 
