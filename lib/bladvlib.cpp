@@ -56,12 +56,56 @@ namespace bladvlib {
 
 #define LBS_UUID_TAKO_BASE { 0xc1, 0x97, 0x12, 0xb5, 0xcf, 0x7e, 0xd7, 0xbc, 0x38, 0x45, 0x02, 0x00, 0x00, 0x00, 0x40, 0x25}
 #define LBS_UUID_TAKO_SERVICE 0xb6b0
+#define TAKO_TX_POWER_LEVEL 7
 
-    static ManagedString takoCircle(   "00000000");
-    static ManagedString takoSquare(   "00000001");
-    static ManagedString takoStar(     "00000002");
-    static ManagedString takoHeart(    "00000003");
-    static ManagedString takoTriangle( "00000004");
+static const int8_t TAKO_TX_POWER_LEVEL_VALUE[] = {-30, -20, -16, -12, -8, -4, 0, 4};
+static  uint8_t TAKO_MANUF_STR[] = "TAKO de-s";
+
+static const ManagedString takoCircle(   "00000000");
+static const ManagedString takoSquare(   "00000001");
+static const ManagedString takoStar(     "00000002");
+static const ManagedString takoHeart(    "00000003");
+static const ManagedString takoTriangle( "00000004");
+
+static ManagedString createSymbolDeviceName( const int8_t symbol)
+{
+    // gap device name
+    ManagedString gapName;  // length: 16
+    
+    if ( 0 > symbol)
+    {
+        // reset
+        gapName = ManagedString("0000000000000000");
+    }
+    else
+    {
+        ManagedString seq("BBBBBBBB");  // length: 8
+        seq = (ManagedString("B8") + ManagedString(uBit.random(999998) + 1) + seq).substring(0, 8);
+        switch (symbol)
+        {
+        case 0:
+            gapName = seq + takoCircle;
+            break;
+        case 1:
+            gapName = seq + takoSquare;
+            break;
+        case 2:
+            gapName = seq + takoStar;
+            break;
+        case 3:
+            gapName = seq + takoHeart;
+            break;
+        case 4:
+            gapName = seq + takoTriangle;
+            break;
+        default:
+            gapName = seq + takoCircle;
+            break;
+        }
+    }
+
+    return gapName;
+}
 
 //================================================================
 #if MICROBIT_CODAL
@@ -138,18 +182,20 @@ static void microbit_ble_configureAdvertising( bool connectable, bool discoverab
 static void microbit_ble_configureAdvertising( bool connectable, bool discoverable, bool whitelist,
                                                uint16_t interval_ms, int timeout_seconds, ble_uuid_t *p_uuid)
 {
+    // adv_data
     ble_advdata_t advdata;
     memset( &advdata, 0, sizeof( advdata));
     advdata.name_type = BLE_ADVDATA_FULL_NAME;
     advdata.flags     = !whitelist && discoverable
                       ? BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED | BLE_GAP_ADV_FLAG_LE_GENERAL_DISC_MODE
                       : BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
-    
+    // scan_rsp_data
     ble_advdata_t scanrsp;
     memset(&scanrsp, 0, sizeof(scanrsp));
+    // advdata.name_type = BLE_ADVDATA_NO_NAME;
     scanrsp.uuids_complete.p_uuids = p_uuid;
     scanrsp.uuids_complete.uuid_cnt = 1;
-
+    // configure
     microbit_ble_configureAdvertising( connectable, discoverable, whitelist, interval_ms, timeout_seconds, &advdata, &scanrsp);
 }
 
@@ -190,66 +236,34 @@ void accumulateCompleteList16BitServiceID( const uint16_t serviceUUID)
 
     // Restart
     uBit.bleManager.advertise();
-} 
+}
 
-void initTako()
+static void initTako()
 {
     if (m_tako_initialized)
     {
         return;
     }
     m_tako_initialized = true;
-    // 128bit uuid for tako
+    // 128bit uuid for TAKO
     static ble_uuid128_t base_uuid = {LBS_UUID_TAKO_BASE};
     MICROBIT_BLE_ECHK(sd_ble_uuid_vs_add(&base_uuid, &m_tako_uuid.type));
     m_tako_uuid.uuid = LBS_UUID_TAKO_SERVICE;
+    // Bluetooth Appearance values
+    // https://infocenter.nordicsemi.com/topic/com.nordic.infocenter.s113.api.v7.0.1/group___b_l_e___a_p_p_e_a_r_a_n_c_e_s.html
+    MICROBIT_BLE_ECHK(sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_COMPUTER));
 }
 
-void setMarkDeviceName( const int8_t mark)
+static void setSymbolDeviceName( const int8_t symbol)
 {
-    // gap device name
-    ManagedString gapName;  // length: 16
-    
-    if ( 0 > mark)
-    {
-        // reset
-        gapName = ManagedString("0000000000000000");
-    }
-    else
-    {
-        ManagedString seq("00000000");  // length: 8
-        seq = (ManagedString(uBit.random(99999998) + 1) + seq).substring(0, 8);
-        switch (mark)
-        {
-        case 0:
-            gapName = seq + takoCircle;
-            break;
-        case 1:
-            gapName = seq + takoSquare;
-            break;
-        case 2:
-            gapName = seq + takoStar;
-            break;
-        case 3:
-            gapName = seq + takoHeart;
-            break;
-        case 4:
-            gapName = seq + takoTriangle;
-            break;
-        default:
-            gapName = seq + takoCircle;
-            break;
-        }
-    }
-    
     // set gap device name
     ble_gap_conn_sec_mode_t sec_mode;
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
+    ManagedString gapName = createSymbolDeviceName(symbol);
     MICROBIT_BLE_ECHK(sd_ble_gap_device_name_set(&sec_mode, (const uint8_t *)gapName.toCharArray(), gapName.length()));
-
 }
 
-void advertiseTako( const int8_t mark)
+void advertiseTako( const int8_t symbol)
 {
     // Stop
     uBit.bleManager.stopAdvertising();
@@ -258,23 +272,44 @@ void advertiseTako( const int8_t mark)
     initTako();
 
     // gap device name
-    setMarkDeviceName( mark);
+    setSymbolDeviceName( symbol);
+
+    // set tx power
+    uBit.bleManager.setTransmitPower(TAKO_TX_POWER_LEVEL);
 
     // Setup advertising.
     bool connectable = false;
     bool discoverable = true;
     bool whitelist = false;
-    microbit_ble_configureAdvertising( connectable, discoverable, whitelist,
-                                       MICROBIT_BLE_ADVERTISING_INTERVAL, MICROBIT_BLE_ADVERTISING_TIMEOUT, &m_tako_uuid);
+    // adv_data
+    ble_advdata_t advdata;
+    memset( &advdata, 0, sizeof( advdata));
+    advdata.name_type = BLE_ADVDATA_FULL_NAME;
+    advdata.flags     = !whitelist && discoverable
+                      ? BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED | BLE_GAP_ADV_FLAG_LE_GENERAL_DISC_MODE
+                      : BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
+    advdata.include_appearance = true;
+    static int8_t tx_power_level = TAKO_TX_POWER_LEVEL_VALUE[TAKO_TX_POWER_LEVEL];
+    advdata.p_tx_power_level = &tx_power_level;
+    // scan_rsp_data
+    ble_advdata_t scanrsp;
+    memset(&scanrsp, 0, sizeof(scanrsp));
+    // advdata.name_type = BLE_ADVDATA_NO_NAME;
+    scanrsp.uuids_complete.p_uuids = &m_tako_uuid;
+    scanrsp.uuids_complete.uuid_cnt = 1;
+    ble_advdata_manuf_data_t manuf;
+    memset(&manuf, 0, sizeof(manuf));
+    manuf.company_identifier = 0x8888;
+    manuf.data.p_data = TAKO_MANUF_STR;
+    manuf.data.size = sizeof(TAKO_MANUF_STR) - 1;
+    scanrsp.p_manuf_specific_data = &manuf;
+    // configure
+    microbit_ble_configureAdvertising( connectable, discoverable, whitelist, 
+                                       MICROBIT_BLE_ADVERTISING_INTERVAL, MICROBIT_BLE_ADVERTISING_TIMEOUT,
+                                       &advdata, &scanrsp);
 
     // Restart
     uBit.bleManager.advertise();
-
-    if ( 0>mark )
-    {
-        // Stop
-        uBit.bleManager.stopAdvertising();
-    }
 }
 
 //================================================================
@@ -287,9 +322,9 @@ void accumulateCompleteList16BitServiceID( const uint16_t serviceUUID)
     uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_16BIT_SERVICE_IDS, (uint8_t *)&serviceUUID, 2);
 }
 
-void advertiseTako( const int8_t mark)
+void advertiseTako( const int8_t symbol)
 {
-    // 0-4: message, -1: reset
+    // NOT SUPPORTED
 }
 
 //================================================================

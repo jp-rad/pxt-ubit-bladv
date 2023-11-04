@@ -29,28 +29,26 @@ namespace bladv
 {
 
     //%
-    void accumulateCompleteList16BitServiceID(int serviceUUID)
+    void accumulateCompleteList16BitServiceID_(int serviceUUID)
     {
         bladvlib::accumulateCompleteList16BitServiceID((uint16_t)serviceUUID);
     }
 
     //%
-    void sendToTako(int mark)
+    void sendToTako_(int mark)
     {
         bladvlib::advertiseTako((int8_t)mark);
     }
 
     //%
-    void resetTako()
+    void resetTako_()
     {
         bladvlib::advertiseTako(-1);
     }
 
     //%
-    void stopTako()
+    void stopTako_()
     {
-        resetTako();
-        // Stop
         uBit.bleManager.stopAdvertising();
     }
 

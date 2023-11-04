@@ -39,7 +39,6 @@ enum TakoSymbols {
     //% block="triangle"
     //% jres=icons.triangle
     Triangle,
-    
 }
 
 /**
@@ -57,7 +56,7 @@ namespace bladv {
     //% blockId=bladv_accumulate_complete_list_16bit_service_id
     //% block="BLADV Complete list of 16-bit Service ID: %serviceUUID"
     //% serviceUUID.min=1 serviceUUID.max=65535 serviceUUID.defl=6144
-    //% shim=bladv::accumulateCompleteList16BitServiceID
+    //% shim=bladv::accumulateCompleteList16BitServiceID_
     //% weight=120
     export function accumulateCompleteList16BitServiceID(serviceUUID: number): void
     {
@@ -66,7 +65,7 @@ namespace bladv {
     
     // for TAKO
     let _counter = -1;
-    loops.everyInterval(200, function () {
+    loops.everyInterval(500, function () {
         if (0 > _counter) {
             // nop
         } else if (0 == _counter) {
@@ -81,8 +80,8 @@ namespace bladv {
     })
 
     /**
-     * Send mark to TAKO.
-     * @param mark 0:circle, 1:square, 2:star, 3:heart, 4:triangle
+     * Send symbol to TAKO.
+     * @param symbol 0:circle, 1:square, 2:star, 3:heart, 4:triangle
      */
     //% blockId=bladv_send_to_tako
     //% block="TAKO Send %i"
@@ -90,24 +89,36 @@ namespace bladv {
     //% mark.fieldOptions.columns="1"
     //% mark.fieldOptions.width="76"
     //% mark.fieldOptions.maxRows="5"
-    //% weight=110
+    //% weight=100
     //% group="Tako"
-    export function sendToTako(mark: TakoSymbols): void
+    export function sendToTako(symbol: TakoSymbols): void
     {
         _counter = 10;
-        _sendToTako(mark);
+        _sendToTako(symbol);
     }
-    
+
     /**
-     * (shim) Send mark to TAKO.
-     * @param mark 0:circle, 1:square, 2:star, 3:heart, 4:triangle
+     * Reset TAKO.
+     */
+    //% blockId=bladv_reset_tako
+    //% block="TAKO Reset"
+    //% weight=90
+    //% group="Tako"
+    export function resetTako(): void
+    {
+        _counter = 5;
+    }
+        
+    /**
+     * (shim) Send symbol to TAKO.
+     * @param symbol 0:circle, 1:square, 2:star, 3:heart, 4:triangle
      */
     //% block
     //% blockHidden=true
-    //% weight=100
+    //% weight=82
     //% group="Tako"
-    //% shim=bladv::sendToTako
-    export function _sendToTako(mark: TakoSymbols): void
+    //% shim=bladv::sendToTako_
+    export function _sendToTako(symbol: TakoSymbols): void
     {
         return;
     }
@@ -117,9 +128,9 @@ namespace bladv {
      */
     //% block
     //% blockHidden=true
-    //% weight=90
+    //% weight=81
     //% group="Tako"
-    //% shim=bladv::resetTako
+    //% shim=bladv::resetTako_
     export function _resetTako(): void
     {
         return;
@@ -132,7 +143,7 @@ namespace bladv {
     //% blockHidden=true
     //% weight=80
     //% group="Tako"
-    //% shim=bladv::stopTako
+    //% shim=bladv::stopTako_
     export function _stopTako(): void
     {
         return;

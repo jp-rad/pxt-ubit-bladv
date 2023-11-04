@@ -8,6 +8,7 @@
   "bladv._sendToTako|block": "true",
   "bladv._stopTako|block": "true",
   "bladv.accumulateCompleteList16BitServiceID|block": "BLADV Complete list of 16-bit Service ID: %serviceUUID",
+  "bladv.resetTako|block": "TAKO Reset",
   "bladv.sendToTako|block": "TAKO Send %i",
   "bladv|block": "BLADV",
   "{id:category}Bladv": "Bladv",
