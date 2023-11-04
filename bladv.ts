@@ -56,7 +56,7 @@ namespace bladv {
     //% blockId=bladv_accumulate_complete_list_16bit_service_id
     //% block="BLADV Complete list of 16-bit Service ID: %serviceUUID"
     //% serviceUUID.min=1 serviceUUID.max=65535 serviceUUID.defl=6144
-    //% shim=bladv::accumulateCompleteList16BitServiceID_
+    //% shim=bladv::accumulateCompleteList16BitServiceID
     //% weight=120
     export function accumulateCompleteList16BitServiceID(serviceUUID: number): void
     {
@@ -73,7 +73,7 @@ namespace bladv {
             _counter = -1;
         } else {
             if (5 == _counter) {
-                _resetTako();
+                _zeroTako();
             }
             _counter -= 1;
         }
@@ -117,23 +117,23 @@ namespace bladv {
     //% blockHidden=true
     //% weight=82
     //% group="Tako"
-    //% shim=bladv::sendToTako_
+    //% shim=bladv::_sendToTako
     export function _sendToTako(symbol: TakoSymbols): void
     {
-        return;
+        // shim
     }
     
     /**
-     * (shim) Reset TAKO.
+     * (shim) Zero TAKO.
      */
     //% block
     //% blockHidden=true
     //% weight=81
     //% group="Tako"
-    //% shim=bladv::resetTako_
-    export function _resetTako(): void
+    //% shim=bladv::_zeroTako
+    export function _zeroTako(): void
     {
-        return;
+        // shim
     }
     
     /**
@@ -143,10 +143,10 @@ namespace bladv {
     //% blockHidden=true
     //% weight=80
     //% group="Tako"
-    //% shim=bladv::stopTako_
+    //% shim=bladv::_stopTako
     export function _stopTako(): void
     {
-        return;
+        // shim
     }
 
 }

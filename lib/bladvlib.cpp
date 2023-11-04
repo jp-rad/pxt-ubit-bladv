@@ -79,8 +79,8 @@ static ManagedString createSymbolDeviceName( const int8_t symbol)
     }
     else
     {
-        ManagedString seq("BBBBBBBB");  // length: 8
-        seq = (ManagedString("B8") + ManagedString(uBit.random(999998) + 1) + seq).substring(0, 8);
+        ManagedString seq;
+        seq = (ManagedString("8B") + ManagedString(uBit.random(99998) + 1) + ManagedString("FFFFFF")).substring(0, 8);
         switch (symbol)
         {
         case 0:
@@ -140,9 +140,11 @@ static ble_uuid_t m_tako_uuid;
  * @param discoverable Choose LE General Discoverable Mode.
  * @param whitelist Filter scan and connect requests with whitelist.
  * @param interval_ms Advertising interval in milliseconds.
- * @param timeout_seconds Advertising timeout in seconds
+ * @param timeout_seconds Advertising timeout in seconds.
+ * @param p_advdata advertising data.
+ * @param p_scanrsp scan responce data.
  */
-static void microbit_ble_configureAdvertising( bool connectable, bool discoverable, bool whitelist,
+static void custom_microbit_ble_configureAdvertising( bool connectable, bool discoverable, bool whitelist,
                                                uint16_t interval_ms, int timeout_seconds,
                                                ble_advdata_t *p_advdata, ble_advdata_t *p_scanrsp)
 {
@@ -176,36 +178,21 @@ static void microbit_ble_configureAdvertising( bool connectable, bool discoverab
     MICROBIT_BLE_ECHK( sd_ble_gap_adv_set_configure( &m_adv_handle, &gap_adv_data, &gap_adv_params));
 }
 
-// static void microbit_ble_configureAdvertising( bool, bool, bool, uint16_t, int, ble_uuid_t *)
-// https://github.com/lancaster-university/codal-microbit-v2/blob/master/source/bluetooth/MicroBitBLEManager.cpp#L1218
-
-static void microbit_ble_configureAdvertising( bool connectable, bool discoverable, bool whitelist,
-                                               uint16_t interval_ms, int timeout_seconds, ble_uuid_t *p_uuid)
-{
-    // adv_data
-    ble_advdata_t advdata;
-    memset( &advdata, 0, sizeof( advdata));
-    advdata.name_type = BLE_ADVDATA_FULL_NAME;
-    advdata.flags     = !whitelist && discoverable
-                      ? BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED | BLE_GAP_ADV_FLAG_LE_GENERAL_DISC_MODE
-                      : BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
-    // scan_rsp_data
-    ble_advdata_t scanrsp;
-    memset(&scanrsp, 0, sizeof(scanrsp));
-    // advdata.name_type = BLE_ADVDATA_NO_NAME;
-    scanrsp.uuids_complete.p_uuids = p_uuid;
-    scanrsp.uuids_complete.uuid_cnt = 1;
-    // configure
-    microbit_ble_configureAdvertising( connectable, discoverable, whitelist, interval_ms, timeout_seconds, &advdata, &scanrsp);
-}
-
 // Setup advertising.
 // https://github.com/lancaster-university/codal-microbit-v2/blob/master/source/bluetooth/MicroBitBLEManager.cpp#L478
+
+// static void microbit_ble_configureAdvertising( bool, bool, bool, uint16_t, int, ble_uuid_t *)
+// https://github.com/lancaster-university/codal-microbit-v2/blob/master/source/bluetooth/MicroBitBLEManager.cpp#L1218
 
 void accumulateCompleteList16BitServiceID( const uint16_t serviceUUID)
 {
     // Stop
     uBit.bleManager.stopAdvertising();
+
+    // 16bit uuid
+    static ble_uuid_t uuid;
+    uuid.type = BLE_UUID_TYPE_BLE;
+    uuid.uuid = serviceUUID;
 
     // Configure
     bool connectable = true;
@@ -227,12 +214,23 @@ void accumulateCompleteList16BitServiceID( const uint16_t serviceUUID)
     MICROBIT_DEBUG_DMESG( "whitelist size = %d", list_size);
 #endif
   
-    // Setup advertising.
-    static ble_uuid_t uuid;
-    uuid.type = BLE_UUID_TYPE_BLE;
-    uuid.uuid = serviceUUID;
-    microbit_ble_configureAdvertising( connectable, discoverable, whitelist,
-                                       MICROBIT_BLE_ADVERTISING_INTERVAL, MICROBIT_BLE_ADVERTISING_TIMEOUT, &uuid);
+    // adv_data
+    ble_advdata_t advdata;
+    memset( &advdata, 0, sizeof( advdata));
+    advdata.name_type = BLE_ADVDATA_FULL_NAME;
+    advdata.flags     = !whitelist && discoverable
+                      ? BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED | BLE_GAP_ADV_FLAG_LE_GENERAL_DISC_MODE
+                      : BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED;
+    // scan_rsp_data
+    ble_advdata_t scanrsp;
+    memset(&scanrsp, 0, sizeof(scanrsp));
+    // advdata.name_type = BLE_ADVDATA_NO_NAME;
+    scanrsp.uuids_complete.p_uuids = &uuid;
+    scanrsp.uuids_complete.uuid_cnt = 1;
+    // configure
+    custom_microbit_ble_configureAdvertising( connectable, discoverable, whitelist, 
+                                       MICROBIT_BLE_ADVERTISING_INTERVAL, MICROBIT_BLE_ADVERTISING_TIMEOUT,
+                                       &advdata, &scanrsp);
 
     // Restart
     uBit.bleManager.advertise();
@@ -256,10 +254,12 @@ static void initTako()
 
 static void setSymbolDeviceName( const int8_t symbol)
 {
+    ManagedString gapName;
+    gapName = createSymbolDeviceName(symbol);
     // set gap device name
     ble_gap_conn_sec_mode_t sec_mode;
+    memset( &sec_mode, 0, sizeof( sec_mode));
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
-    ManagedString gapName = createSymbolDeviceName(symbol);
     MICROBIT_BLE_ECHK(sd_ble_gap_device_name_set(&sec_mode, (const uint8_t *)gapName.toCharArray(), gapName.length()));
 }
 
@@ -304,7 +304,7 @@ void advertiseTako( const int8_t symbol)
     manuf.data.size = sizeof(TAKO_MANUF_STR) - 1;
     scanrsp.p_manuf_specific_data = &manuf;
     // configure
-    microbit_ble_configureAdvertising( connectable, discoverable, whitelist, 
+    custom_microbit_ble_configureAdvertising( connectable, discoverable, whitelist, 
                                        MICROBIT_BLE_ADVERTISING_INTERVAL, MICROBIT_BLE_ADVERTISING_TIMEOUT,
                                        &advdata, &scanrsp);
 
