@@ -54,12 +54,9 @@ DEALINGS IN THE SOFTWARE.
 
 namespace bladvlib {
 
-#define LBS_UUID_TAKO_BASE { 0xc1, 0x97, 0x12, 0xb5, 0xcf, 0x7e, 0xd7, 0xbc, 0x38, 0x45, 0x02, 0x00, 0x00, 0x00, 0x40, 0x25}
-#define LBS_UUID_TAKO_SERVICE 0xb6b0
 #define TAKO_TX_POWER_LEVEL 7
 
 static const int8_t TAKO_TX_POWER_LEVEL_VALUE[] = {-30, -20, -16, -12, -8, -4, 0, 4};
-static  uint8_t TAKO_MANUF_STR[] = "TAKO de-s";
 
 static const ManagedString takoCircle(   "00000000");
 static const ManagedString takoSquare(   "00000001");
@@ -113,6 +110,10 @@ static ManagedString createSymbolDeviceName( const int8_t symbol)
 
 #include "ble_advdata.h"
 #include "peer_manager.h"
+
+#define LBS_UUID_TAKO_BASE { 0xc1, 0x97, 0x12, 0xb5, 0xcf, 0x7e, 0xd7, 0xbc, 0x38, 0x45, 0x02, 0x00, 0x00, 0x00, 0x40, 0x25}
+#define LBS_UUID_TAKO_SERVICE 0xb6b0
+
 /**
  * For configure advertising
  * 
@@ -129,6 +130,8 @@ static uint8_t              m_enc_scanrsp[ BLE_GAP_ADV_SET_DATA_SIZE_MAX];
  */
 static bool m_tako_initialized = false;
 static ble_uuid_t m_tako_uuid;
+static const uint16_t TAKO_MANUF_ID = 0x8888;
+static uint8_t TAKO_MANUF_STR[] = "TAKO de-s";
 
 // static void microbit_ble_configureAdvertising( bool, bool, bool, uint16_t, int, ble_advdata_t *);
 // https://github.com/lancaster-university/codal-microbit-v2/blob/master/source/bluetooth/MicroBitBLEManager.cpp#L1187
@@ -299,7 +302,7 @@ void advertiseTako( const int8_t symbol)
     scanrsp.uuids_complete.uuid_cnt = 1;
     ble_advdata_manuf_data_t manuf;
     memset(&manuf, 0, sizeof(manuf));
-    manuf.company_identifier = 0x8888;
+    manuf.company_identifier = TAKO_MANUF_ID;
     manuf.data.p_data = TAKO_MANUF_STR;
     manuf.data.size = sizeof(TAKO_MANUF_STR) - 1;
     scanrsp.p_manuf_specific_data = &manuf;
@@ -316,15 +319,58 @@ void advertiseTako( const int8_t symbol)
 #else // MICROBIT_CODAL
 //================================================================
 
+/**
+ * Tako 
+ */
+static const uint8_t TAKO_SERVICE_UUID[] = {0xc1, 0x97, 0x12, 0xb5, 0xcf, 0x7e, 0xd7, 0xbc, 0x38, 0x45, 0x02, 0x00, 0xb0, 0xb6, 0x40, 0x25};
+static const uint8_t TAKO_MANUF_DATA[] = {0x88, 0x88, 'T', 'A', 'K', 'O', ' ', 'd', 'e', '-', 's'};
+static bool m_tako_initialized = false;
+
 void accumulateCompleteList16BitServiceID( const uint16_t serviceUUID)
 {
-    // Complete list of 16-bit Service IDs.
-    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LIST_16BIT_SERVICE_IDS, (uint8_t *)&serviceUUID, 2);
+    uBit.ble->stopAdvertising();
+    // [Scan Response] Complete list of 16-bit Service IDs.
+    uBit.ble->accumulateScanResponse(GapAdvertisingData::COMPLETE_LIST_16BIT_SERVICE_IDS, (uint8_t *)&serviceUUID, 2);
+
+    uBit.ble->startAdvertising();
+}
+
+static void initTako()
+{
+    if (m_tako_initialized)
+    {
+        return;
+    }
+    m_tako_initialized = true;
+    
+    // TODO: not connectable, tx power, appearance
+    // // Device is scannable but not connectable.
+    // uBit.ble->setAdvertisingType(GapAdvertisingParams::ADV_SCANNABLE_UNDIRECTED);
+    // // set tx power
+    // uBit.bleManager.setTransmitPower(TAKO_TX_POWER_LEVEL);
+    // // Tx power
+    // uBit.ble->setTxPower(TAKO_TX_POWER_LEVEL_VALUE[TAKO_TX_POWER_LEVEL]);
+    // // Bluetooth Appearance values
+    // // https://infocenter.nordicsemi.com/topic/com.nordic.infocenter.s113.api.v7.0.1/group___b_l_e___a_p_p_e_a_r_a_n_c_e_s.html
+    // uBit.ble->setAppearance(GapAdvertisingData::GENERIC_COMPUTER);
+
+    // [Scan Response] Complete list of 16-bit Service IDs.
+    uBit.ble->accumulateScanResponse(GapAdvertisingData::COMPLETE_LIST_128BIT_SERVICE_IDS, (uint8_t *)TAKO_SERVICE_UUID, sizeof(TAKO_SERVICE_UUID));
+    // [Scan Response] Manufacturer Specific Data.
+    uBit.ble->accumulateScanResponse(GapAdvertisingData::MANUFACTURER_SPECIFIC_DATA, (uint8_t *)TAKO_MANUF_DATA, sizeof(TAKO_MANUF_DATA));
 }
 
 void advertiseTako( const int8_t symbol)
 {
-    // NOT SUPPORTED
+    uBit.ble->stopAdvertising();
+    initTako();
+
+    // Complete Local Name.
+    ManagedString gapName;
+    gapName = createSymbolDeviceName(symbol);
+    uBit.ble->accumulateAdvertisingPayload(GapAdvertisingData::COMPLETE_LOCAL_NAME, (uint8_t *)gapName.toCharArray(), gapName.length());
+ 
+    uBit.ble->startAdvertising();
 }
 
 //================================================================

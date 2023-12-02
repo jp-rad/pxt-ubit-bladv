@@ -121,6 +121,7 @@ namespace bladv {
     export function _sendToTako(symbol: TakoSymbols): void
     {
         // shim
+        console.log("_sendToTako()")
     }
     
     /**
@@ -134,6 +135,7 @@ namespace bladv {
     export function _zeroTako(): void
     {
         // shim
+        console.log("_zeroTako()")
     }
     
     /**
@@ -147,6 +149,7 @@ namespace bladv {
     export function _stopTako(): void
     {
         // shim
+        console.log("_stopTako()")
     }
 
 }
