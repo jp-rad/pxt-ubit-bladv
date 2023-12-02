@@ -1,6 +1,6 @@
 {
     "name": "pxt-ubit-bladv",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "description": "Accumulate the Complete list of 16-bit Service UUIDs as an AD structure in the advertising payload for micro:bit.",
     "dependencies": {
         "core": "*"
